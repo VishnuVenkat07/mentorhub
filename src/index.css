@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── CSS Custom Properties (injected from theme.js via main.jsx) ─── */
+:root {
+  --color-primary:     #0f172a;
+  --color-secondary:   #1e293b;
+  --color-card:        #1e2547;
+  --color-accent:      #f97316;
+  --color-accentGold:  #f59e0b;
+  --color-text:        #f1f5f9;
+  --color-textMuted:   #94a3b8;
+  --color-border:      #334155;
+  --color-gradientFrom:#0f172a;
+  --color-gradientTo:  #1e1b4b;
+}
+
+/* ─── Base Resets ─── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--color-primary);
+  color: var(--color-text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--color-primary); }
+::-webkit-scrollbar-thumb { background: var(--color-accent); border-radius: 4px; }
+
+/* ─── Utility Classes ─── */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accentGold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, var(--color-gradientFrom) 0%, var(--color-gradientTo) 100%);
+}
+
+.card-surface {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+}
+
+.accent-gradient {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accentGold));
+}
+
+.section-alt {
+  background-color: var(--color-secondary);
+}
+
+/* ─── Ticker Animation ─── */
+.ticker-wrapper { overflow: hidden; }
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker 35s linear infinite;
+}
+.ticker-track:hover { animation-play-state: paused; }
+
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ─── Subtle grid pattern overlay ─── */
+.pattern-bg {
+  background-image:
+    radial-gradient(rgba(249,115,22,0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
