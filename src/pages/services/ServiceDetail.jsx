@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import {
@@ -38,11 +38,12 @@ const serviceConfig = {
     g1: '#0a0f2e', g2: '#1e3a8a',
     image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=1200&q=80&auto=format&fit=crop',
     sideImage: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800&q=80&auto=format&fit=crop',
-    overview: 'Great products start with great design. Our UI/UX team applies research-driven methodologies to craft interfaces that are both visually stunning and deeply intuitive. We design systems that scale and deliver measurable improvements in user engagement and conversion rates.',
+    overview: 'Great products start with great design. Our UI/UX team applies research-driven methodologies to craft interfaces that are visually stunning, deeply intuitive, and built to convert. We go beyond aesthetics — every design decision is grounded in user psychology, behavior data, and business goals to deliver experiences your users will love and return to.',
     faqs: [
-      { q: '01. What is your UI/UX design process?', a: 'We follow a 5-stage process: Discovery → Research → Wireframing → Visual Design → Prototyping & Testing. Every decision is data-backed and user-validated before handoff to developers.' },
-      { q: '02. What tools do you use for design?', a: 'Our primary tool is Figma for wireframing, prototyping, and design systems. We also use FigJam for workshops, Maze for usability testing, and Zeplin for developer handoff.' },
-      { q: '03. Can you redesign an existing product?', a: 'Yes. We regularly audit existing interfaces, identify friction points through heuristic evaluation and user interviews, then propose a redesign roadmap that improves usability without disrupting your user base.' },
+      { q: '01. What is your UI/UX design process?', a: 'We follow a 5-stage process: Discovery → User Research → Wireframing → Visual Design → Prototyping & Testing. Every decision is data-backed and user-validated before handoff to developers. We involve you at every stage so there are no surprises.' },
+      { q: '02. What tools do you use for design?', a: 'Our primary tool is Figma for wireframing, prototyping, and design systems. We also use FigJam for collaborative workshops, Maze for usability testing, Hotjar for behavior analytics, and Zeplin for pixel-perfect developer handoff.' },
+      { q: '03. Can you redesign an existing product?', a: 'Absolutely. We audit existing interfaces through heuristic evaluation, user interviews, and analytics. We then propose a prioritized redesign roadmap that improves usability and conversion rates without disrupting your existing user base.' },
+      { q: '04. Do you create design systems?', a: 'Yes. We build scalable design systems with reusable components, typography scales, color tokens, spacing rules, and interaction patterns — documented in Figma so your product team can build consistently at speed.' },
     ],
   },
   'data-analytics': {
@@ -158,6 +159,23 @@ export default function ServiceDetail({ service }) {
   const Icon = iconMap[icon] || FaGlobe
   const cfg  = serviceConfig[id] || serviceConfig['web-development']
 
+  // Sidebar sticks when its bottom reaches the viewport bottom
+  const sidebarRef = useRef(null)
+  const [stickyTop, setStickyTop] = useState(80)
+  useEffect(() => {
+    const calc = () => {
+      if (sidebarRef.current) {
+        const cardH = sidebarRef.current.offsetHeight
+        const viewH = window.innerHeight
+        const top = Math.max(80, viewH - cardH - 24)
+        setStickyTop(top)
+      }
+    }
+    calc()
+    window.addEventListener('resize', calc)
+    return () => window.removeEventListener('resize', calc)
+  }, [])
+
   return (
     <div style={{ background: '#f8fafc' }}>
 
@@ -214,30 +232,56 @@ export default function ServiceDetail({ service }) {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-10 items-start">
 
             {/* ── LEFT SIDEBAR — All Services ── */}
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1" style={{ alignSelf: 'flex-start', position: 'sticky', top: stickyTop }}>
               <AnimatedSection variant="fadeLeft">
-                <div className="rounded-2xl overflow-hidden sticky top-24"
-                  style={{ background: '#fff', border: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
-                  <div className="px-6 py-5" style={{ background: 'linear-gradient(135deg,#0a0f2e,#1e3a8a)' }}>
-                    <h3 className="font-black text-white tracking-wide" style={{ fontSize: '1rem' }}>All Services</h3>
+                <div ref={sidebarRef} className="rounded-2xl overflow-hidden"
+                  style={{ background: '#fff', border: '1px solid #e2e8f0', boxShadow: '0 8px 32px rgba(30,58,138,0.10)' }}>
+
+                  {/* Header */}
+                  <div className="px-5 py-3 relative overflow-hidden"
+                    style={{ background: 'linear-gradient(135deg,#0a0f2e 0%,#1e3a8a 100%)' }}>
+                    <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(circle,rgba(255,255,255,0.07) 1px,transparent 1px)', backgroundSize:'18px 18px' }} />
+                    <div className="relative">
+                      <h3 className="font-bold text-white" style={{ fontSize:'1.1rem', letterSpacing:'0.01em' }}>Our Services</h3>
+                    </div>
                   </div>
+
+                  {/* Services list */}
                   <ul>
                     {services.map((s, i) => {
                       const isActive = s.id === id
                       return (
                         <li key={s.id} style={{ borderBottom: i < services.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
                           <Link to={s.path}
-                            className="flex items-center justify-between px-5 py-4 transition-all duration-200"
-                            style={{ background: isActive ? '#eff6ff' : 'transparent', borderLeft: isActive ? '3px solid #2563eb' : '3px solid transparent' }}
-                            onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = '#f8fafc' }}
-                            onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent' }}>
-                            <span style={{ fontSize: '0.9rem', fontWeight: 600, color: isActive ? '#2563eb' : '#334155' }}>{s.title}</span>
-                            <FaArrowRight size={11} style={{ color: isActive ? '#2563eb' : '#94a3b8', flexShrink: 0 }} />
+                            className="flex items-center justify-between transition-all duration-200"
+                            style={{
+                              padding: '13px 20px',
+                              background: isActive ? '#2563eb' : 'transparent',
+                              borderLeft: isActive ? '4px solid #93c5fd' : '4px solid transparent',
+                            }}
+                            onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = '#eff6ff'; e.currentTarget.style.borderLeft = '4px solid #2563eb' } }}
+                            onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderLeft = '4px solid transparent' } }}>
+                            <span style={{ fontSize: '0.9rem', fontWeight: isActive ? 700 : 500, color: isActive ? '#fff' : '#334155', letterSpacing: '-0.01em' }}>
+                              {s.title}
+                            </span>
+                            <FaArrowRight size={10} style={{ color: isActive ? '#bfdbfe' : '#cbd5e1', flexShrink: 0 }} />
                           </Link>
                         </li>
                       )
                     })}
                   </ul>
+
+                  {/* Bottom CTA */}
+                  <div className="mx-4 mb-4 mt-2 rounded-xl p-4 text-center"
+                    style={{ background:'linear-gradient(135deg,#eff6ff,#dbeafe)', border:'1px solid #bfdbfe' }}>
+                    <p style={{ fontSize:'0.78rem', fontWeight:600, color:'#1e3a8a', marginBottom:8 }}>Need help choosing?</p>
+                    <Link to="/contact"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-white font-bold transition-all"
+                      style={{ background:'linear-gradient(135deg,#1e3a8a,#2563eb)', fontSize:'0.78rem', boxShadow:'0 2px 8px rgba(37,99,235,0.3)' }}>
+                      Free Consultation <FaArrowRight size={9} />
+                    </Link>
+                  </div>
+
                 </div>
               </AnimatedSection>
             </div>
