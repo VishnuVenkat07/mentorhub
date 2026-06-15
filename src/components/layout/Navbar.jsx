@@ -25,12 +25,14 @@ const NAV = [
     ],
   },
   {
-    label: 'Jobs',
+    label: 'Career',
     path: '/career/jobs',
-  },
-  {
-    label: 'Internships',
-    path: '/career/internships',
+    cols: 2,
+    headline: 'Jobs & internship opportunities',
+    dropdown: [
+      { label: 'Job Openings', path: '/career/jobs',        desc: 'Full-time positions at top tech companies' },
+      { label: 'Internships',  path: '/career/internships', desc: 'Paid internship programs for students' },
+    ],
   },
   {
     label: 'Services',
