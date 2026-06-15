@@ -25,6 +25,9 @@ import AITools          from './pages/mentorship/AITools'
 import ServiceDetail from './pages/services/ServiceDetail'
 import { services }  from './data/services'
 
+// Career detail page
+import JobDetail from './pages/career/JobDetail'
+
 function ScrollToTop() {
   const { pathname } = useLocation()
   useEffect(() => { window.scrollTo(0, 0) }, [pathname])
@@ -57,6 +60,9 @@ export default function App() {
             <Route path="/mentorship/college-placement" element={<CollegePlacement />} />
             <Route path="/mentorship/resume-building"   element={<ResumeBuilding />} />
             <Route path="/mentorship/ai-tools"          element={<AITools />} />
+
+            {/* Career individual job/internship pages */}
+            <Route path="/career/:id" element={<JobDetail />} />
 
             {/* Service detail pages — shared template */}
             {services.map(s => (
