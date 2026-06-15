@@ -25,16 +25,12 @@ const NAV = [
     ],
   },
   {
-    label: 'Career',
-    path: '/career',
-    cols: 2,
-    headline: 'Jobs, internships & prep resources',
-    dropdown: [
-      { label: 'Job Openings',   path: '/career',                       desc: 'Full-time positions at top tech companies' },
-      { label: 'Internships',    path: '/career',                       desc: 'Paid internship programs for students' },
-      { label: 'Resume Tips',    path: '/mentorship/resume-building',   desc: 'Build an ATS-ready resume' },
-      { label: 'Interview Prep', path: '/mentorship/college-placement', desc: 'Mock interviews & coding rounds' },
-    ],
+    label: 'Jobs',
+    path: '/career/jobs',
+  },
+  {
+    label: 'Internships',
+    path: '/career/internships',
   },
   {
     label: 'Services',

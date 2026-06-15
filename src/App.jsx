@@ -6,7 +6,8 @@ import PageLoader from './components/ui/PageLoader'
 import Home    from './pages/Home'
 import About   from './pages/About'
 import Mentorship from './pages/Mentorship'
-import Career  from './pages/Career'
+import Jobs        from './pages/career/Jobs'
+import Internships from './pages/career/Internships'
 import Services from './pages/Services'
 import Contact from './pages/Contact'
 
@@ -46,7 +47,8 @@ export default function App() {
             <Route path="/"       element={<Home />} />
             <Route path="/about"  element={<About />} />
             <Route path="/mentorship" element={<Mentorship />} />
-            <Route path="/career" element={<Career />} />
+            <Route path="/career/jobs"        element={<Jobs />} />
+            <Route path="/career/internships" element={<Internships />} />
             <Route path="/services" element={<Services />} />
             <Route path="/contact" element={<Contact />} />
 
