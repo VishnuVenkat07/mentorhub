@@ -38,7 +38,7 @@ const mentorAvatars = [
 
 export default function MentorshipSubPage({ program }) {
   const { id, title, description, tools, learnings, color } = program
-  const heroImg = heroImages[id] || heroImages['full-stack']
+  const heroImg = program.heroImg || heroImages[id] || heroImages['full-stack']
 
   return (
     <div className="overflow-x-hidden">

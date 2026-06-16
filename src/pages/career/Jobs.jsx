@@ -101,28 +101,15 @@ function ApplyModal({ item, onClose }) {
 }
 
 // ─── Job Row ───────────────────────────────────────────────────────────────────
-function JobRow({ item, onApply }) {
-  const [open, setOpen] = useState(false)
+function JobRow({ item, open, onToggle, onApply }) {
   return (
-    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '1rem', overflow: 'hidden',
-      boxShadow: open ? '0 8px 32px rgba(37,99,235,0.08)' : '0 1px 4px rgba(0,0,0,0.04)', transition: 'box-shadow 0.25s' }}>
-      <button onClick={() => setOpen(v => !v)}
+    <div style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', overflow: 'hidden' }}>
+      <button onClick={onToggle}
         className="w-full flex items-center justify-between px-5 py-4 text-left"
         style={{ background: open ? '#f0f6ff' : '#fff', transition: 'background 0.2s' }}>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 min-w-0 flex-1">
-          <div className="flex-1 min-w-0">
-            <span className="block text-sm font-bold" style={{ color: '#0f172a' }}>{item.title}</span>
-            <span className="text-xs" style={{ color: '#64748b' }}>{item.experience} · {item.code}</span>
-          </div>
-          <div className="flex flex-wrap items-center gap-2 flex-shrink-0">
-            <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full" style={{ background: '#eff6ff', color: '#2563eb' }}>
-              <FaMapMarkerAlt size={9} /> {item.location}
-            </span>
-            <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full" style={{ background: '#fefce8', color: '#ca8a04' }}>
-              <FaMoneyBillWave size={9} /> {item.salary}
-            </span>
-          </div>
-        </div>
+        <span className="font-semibold" style={{ fontSize: '1rem', color: '#0f172a' }}>
+          {item.title} &nbsp;–&nbsp; ({item.experience})
+        </span>
         <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.22 }}
           className="ml-4 flex-shrink-0" style={{ color: open ? '#2563eb' : '#94a3b8' }}>
           <FaChevronDown size={14} />
@@ -134,29 +121,40 @@ function JobRow({ item, onApply }) {
             exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.28, ease: 'easeInOut' }}
             style={{ overflow: 'hidden' }}>
             <div className="px-5 pb-6 pt-1" style={{ borderTop: '1px solid #e2e8f0' }}>
-              <div className="flex flex-wrap gap-2 mt-4 mb-4">
+              <div className="flex flex-wrap gap-2 mt-4 mb-3">
+                <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full" style={{ background: '#eff6ff', color: '#2563eb' }}>
+                  <FaMapMarkerAlt size={9} /> {item.location}
+                </span>
+                <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full" style={{ background: '#fefce8', color: '#ca8a04' }}>
+                  <FaMoneyBillWave size={9} /> {item.salary}
+                </span>
+                <span className="text-xs px-2.5 py-1 rounded-full" style={{ background: '#f1f5f9', color: '#64748b' }}>
+                  {item.code}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2 mb-4">
                 {item.tags.map(tag => (
                   <span key={tag} className="px-3 py-1 rounded-md text-xs font-medium"
                     style={{ background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe' }}>{tag}</span>
                 ))}
               </div>
-              <p className="text-sm mb-5" style={{ color: '#475569', lineHeight: 1.75 }}>{item.description}</p>
+              <p className="mb-5" style={{ fontSize: '0.95rem', color: '#475569', lineHeight: 1.8 }}>{item.description}</p>
               <div className="grid sm:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#2563eb' }}>Skills Required</p>
+                  <p className="font-bold uppercase tracking-widest mb-3" style={{ fontSize: '0.78rem', color: '#2563eb' }}>Skills Required</p>
                   <ul className="space-y-2">
                     {item.skills.map((s, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm" style={{ color: '#475569' }}>
+                      <li key={i} className="flex items-start gap-2" style={{ fontSize: '0.95rem', color: '#475569' }}>
                         <span style={{ width:6, height:6, borderRadius:'50%', background:'#2563eb', flexShrink:0, marginTop:6 }} />{s}
                       </li>
                     ))}
                   </ul>
                 </div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#2563eb' }}>Key Responsibilities</p>
+                  <p className="font-bold uppercase tracking-widest mb-3" style={{ fontSize: '0.78rem', color: '#2563eb' }}>Key Responsibilities</p>
                   <ul className="space-y-2">
                     {item.responsibilities.map((r, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm" style={{ color: '#475569' }}>
+                      <li key={i} className="flex items-start gap-2" style={{ fontSize: '0.95rem', color: '#475569' }}>
                         <span style={{ width:6, height:6, borderRadius:'50%', background:'#1e3a8a', flexShrink:0, marginTop:6 }} />{r}
                       </li>
                     ))}
@@ -189,6 +187,9 @@ const WHY = [
 
 export default function Jobs() {
   const [applying, setApplying] = useState(null)
+  const [openId, setOpenId]     = useState(null)
+
+  const toggle = (id) => setOpenId(prev => prev === id ? null : id)
 
   return (
     <div style={{ background: '#f8fafc', minHeight: '100vh' }}>
@@ -226,10 +227,10 @@ export default function Jobs() {
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl sm:text-3xl font-black" style={{ color:'#0f172a' }}>
+            <h2 className="font-black" style={{ fontSize: '1.6rem', color:'#0f172a' }}>
               Are You a <span style={{ color:'#2563eb' }}>Good Fit?</span>
             </h2>
-            <p className="mt-2 text-sm max-w-xl mx-auto" style={{ color:'#64748b' }}>
+            <p className="mt-2 max-w-xl mx-auto" style={{ fontSize: '1rem', color:'#64748b' }}>
               We look for curious, driven people who love solving problems and growing with a team.
             </p>
           </div>
@@ -241,8 +242,8 @@ export default function Jobs() {
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background:'#eff6ff' }}>
                   <w.icon size={18} style={{ color:'#2563eb' }} />
                 </div>
-                <p className="text-sm font-bold mb-1" style={{ color:'#0f172a' }}>{w.title}</p>
-                <p className="text-xs leading-relaxed" style={{ color:'#64748b' }}>{w.desc}</p>
+                <p className="font-bold mb-1" style={{ fontSize: '0.95rem', color:'#0f172a' }}>{w.title}</p>
+                <p className="leading-relaxed" style={{ fontSize: '0.875rem', color:'#64748b' }}>{w.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -253,31 +254,55 @@ export default function Jobs() {
       <section className="pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           <div className="mb-6">
-            <h2 className="text-xl font-black" style={{ color:'#0f172a' }}>Current Job Openings</h2>
-            <p className="text-sm mt-1" style={{ color:'#64748b' }}>
+            <h2 className="font-black" style={{ fontSize: '1.6rem', color:'#0f172a' }}>Current Job Openings</h2>
+            <p className="mt-1" style={{ fontSize: '1rem', color:'#64748b' }}>
               Full-time positions from our trusted hiring partner network. Click any role to view details.
             </p>
           </div>
-          <div className="flex flex-col gap-3">
-            {jobs.map(item => <JobRow key={item.id} item={item} onApply={setApplying} />)}
+          <div style={{ border: '1px solid #e2e8f0', borderRadius: '1rem', overflow: 'hidden', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+            {jobs.map(item => <JobRow key={item.id} item={item} open={openId === item.id} onToggle={() => toggle(item.id)} onApply={setApplying} />)}
           </div>
         </div>
       </section>
 
       {/* ── Bottom CTA ── */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="rounded-3xl px-8 py-12"
-            style={{ background:'linear-gradient(135deg,#1e3a8a 0%,#2563eb 100%)', boxShadow:'0 24px 64px rgba(37,99,235,0.22)' }}>
-            <h2 className="text-2xl sm:text-3xl font-black text-white mb-3">Don't See the Right Role?</h2>
-            <p className="mb-7 text-sm" style={{ color:'rgba(255,255,255,0.75)', maxWidth:480, margin:'0 auto 1.75rem' }}>
-              We're always looking for talented people. Send us your profile and we'll reach out when the perfect opportunity comes up.
-            </p>
-            <motion.a href="/contact" whileHover={{ scale:1.04 }} whileTap={{ scale:0.97 }}
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-bold"
-              style={{ background:'#fff', color:'#2563eb', boxShadow:'0 4px 16px rgba(0,0,0,0.15)' }}>
-              Get in Touch <FaArrowRight size={12} />
-            </motion.a>
+        <div className="max-w-5xl mx-auto">
+          <div className="rounded-3xl overflow-hidden relative"
+            style={{ background: 'linear-gradient(120deg, #1e40af 0%, #2563eb 50%, #38bdf8 100%)', boxShadow: '0 24px 64px rgba(37,99,235,0.28)', minHeight: 220 }}>
+            {/* Grid pattern overlay */}
+            <div style={{ position:'absolute', inset:0, backgroundImage:'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)', backgroundSize:'32px 32px', zIndex:0 }} />
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 px-10 py-10">
+              {/* Left */}
+              <div className="flex-1">
+                <h2 className="font-black text-white mb-6" style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)', lineHeight: 1.2 }}>
+                  Ready to Land Your<br />Dream Job Today!
+                </h2>
+                <div className="flex flex-wrap gap-3">
+                  <motion.a href="https://wa.me/919000000000" target="_blank" rel="noreferrer"
+                    whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold"
+                    style={{ background: '#fff', color: '#2563eb', boxShadow: '0 2px 12px rgba(0,0,0,0.15)' }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    Connect on WhatsApp
+                  </motion.a>
+                  <motion.a href="/contact"
+                    whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold text-white"
+                    style={{ background: '#0f172a', boxShadow: '0 2px 12px rgba(0,0,0,0.25)' }}>
+                    Get in Touch <FaArrowRight size={11} />
+                  </motion.a>
+                </div>
+              </div>
+              {/* Right — person image */}
+              <div className="flex-shrink-0 hidden md:block" style={{ position: 'relative' }}>
+                <img
+                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&q=80&auto=format&fit=crop"
+                  alt="Career expert"
+                  style={{ height: 220, width: 'auto', objectFit: 'cover', objectPosition: 'top', borderRadius: '1rem', display: 'block' }}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </section>

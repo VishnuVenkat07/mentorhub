@@ -10,24 +10,66 @@ const NAV = [
   {
     label: 'Mentorship',
     path: '/mentorship',
-    cols: 3,
-    headline: '9 expert-led programs available',
-    dropdown: [
-      { label: 'Full Stack Dev',    path: '/mentorship/full-stack',        desc: 'React, Node.js & MongoDB' },
-      { label: 'Mobile App Dev',    path: '/mentorship/mobile-app',        desc: 'React Native & Flutter' },
-      { label: 'UI/UX Design',      path: '/mentorship/design',            desc: 'Figma & design systems' },
-      { label: 'Data Analytics',    path: '/mentorship/data-analytics',    desc: 'Power BI, SQL & Python' },
-      { label: 'DevOps & Cloud',    path: '/mentorship/devops',            desc: 'Docker, AWS & CI/CD' },
-      { label: 'MERN Stack',        path: '/mentorship/mern',              desc: 'Full MERN development' },
-      { label: 'College Placement', path: '/mentorship/college-placement', desc: 'Campus recruitment prep' },
-      { label: 'Resume Building',   path: '/mentorship/resume-building',   desc: 'ATS-ready resumes & LinkedIn' },
-      { label: 'AI Tools',          path: '/mentorship/ai-tools',          desc: 'ChatGPT, Copilot & more' },
+    // Two-panel mega menu (categories → sub-courses)
+    categories: [
+      {
+        label: 'Full Stack Dev',
+        desc: 'Mentorship',
+        items: [
+          { label: 'Java Full Stack',   desc: 'Spring Boot, React & MySQL',     path: '/mentorship/java-fullstack'  },
+          { label: 'Python Full Stack', desc: 'Django, Flask & PostgreSQL',      path: '/mentorship/python-fullstack'},
+          { label: 'MERN Stack',        desc: 'MongoDB, Express, React, Node',   path: '/mentorship/mern'            },
+          { label: 'MEAN Stack',        desc: 'MongoDB, Express, Angular, Node', path: '/mentorship/mean-stack'      },
+          { label: 'Mobile App Dev',    desc: 'React Native & Flutter',          path: '/mentorship/mobile-app'      },
+          { label: 'UI/UX Design',      desc: 'Figma, prototyping & systems',    path: '/mentorship/design'          },
+        ],
+      },
+      {
+        label: 'DevOps',
+        desc: 'Mentorship',
+        items: [
+          { label: 'AWS Cloud',           desc: 'EC2, S3, Lambda & more',        path: '/mentorship/aws-cloud'         },
+          { label: 'CI/CD Pipeline',      desc: 'GitHub Actions, Jenkins & CD',  path: '/mentorship/cicd-pipeline'     },
+          { label: 'Docker & Kubernetes', desc: 'Containers & orchestration',     path: '/mentorship/docker-kubernetes' },
+          { label: 'Linux Fundamentals',  desc: 'Shell scripting & server admin', path: '/mentorship/linux-fundamentals'},
+        ],
+      },
+      {
+        label: 'Data Analytics',
+        desc: 'Mentorship',
+        items: [
+          { label: 'Power BI',           desc: 'Dashboards & business reports',   path: '/mentorship/power-bi'          },
+          { label: 'Excel for Analysts', desc: 'Pivot tables, charts & macros',   path: '/mentorship/excel-analytics'   },
+          { label: 'SQL & Python',       desc: 'Queries, pandas & data wrangling',path: '/mentorship/sql-python'        },
+          { label: 'Data Visualization', desc: 'Tableau, Matplotlib & Seaborn',   path: '/mentorship/data-visualization'},
+        ],
+      },
+      {
+        label: 'Generative AI',
+        desc: 'Mentorship',
+        items: [
+          { label: 'RAG Systems',              desc: 'LangChain, vector DBs & retrieval', path: '/mentorship/rag-systems' },
+          { label: 'AI Tools Mastery',         desc: 'ChatGPT, Copilot & automation',     path: '/mentorship/ai-tools'    },
+          { label: 'AI with Java (Spring AI)', desc: 'Spring AI, LLMs & Java agents',     path: '/mentorship/ai-java'     },
+          { label: 'AI with Python',           desc: 'OpenAI API, agents & workflows',    path: '/mentorship/ai-python'   },
+        ],
+      },
+      {
+        label: 'Placement',
+        desc: 'Mentorship',
+        items: [
+          { label: 'Resume Building',    desc: 'ATS-ready resumes & LinkedIn',   path: '/mentorship/resume-building' },
+          { label: 'Portfolio Building', desc: 'GitHub, projects & showcase',    path: '/mentorship/portfolio'       },
+          { label: 'Career Practice',    desc: 'Job search & career roadmap',    path: '/mentorship/career-practice' },
+          { label: 'Mock Interviews',    desc: 'DSA, system design & HR rounds', path: '/mentorship/mock-interviews' },
+        ],
+      },
     ],
   },
   {
     label: 'Career',
     path: '/career/jobs',
-    cols: 2,
+    cols: 1,
     headline: 'Jobs & internship opportunities',
     dropdown: [
       { label: 'Job Openings', path: '/career/jobs',        desc: 'Full-time positions at top tech companies' },
@@ -60,6 +102,8 @@ export default function Navbar() {
   const [scrolled, setScrolled]             = useState(false)
   const [activeDropdown, setActiveDropdown] = useState(null)
   const [mobileExpanded, setMobileExpanded] = useState(null)
+  const [mobileCat, setMobileCat]           = useState(null)
+  const [activeCat, setActiveCat]           = useState(0)
   const { pathname }                        = useLocation()
   const closeTimer                          = useRef(null)
 
@@ -82,7 +126,8 @@ export default function Navbar() {
 
   const isActive = (link) =>
     pathname === link.path ||
-    (link.dropdown && link.dropdown.some(d => pathname === d.path)) ||
+    (link.dropdown  && link.dropdown.some(d => pathname === d.path)) ||
+    (link.categories && link.categories.some(cat => cat.items.some(d => pathname === d.path))) ||
     (link.path !== '/' && pathname.startsWith(link.path + '/'))
 
   return (
@@ -124,11 +169,11 @@ export default function Navbar() {
 
           <div className="w-px h-5 mx-5 flex-shrink-0" style={{ background: 'var(--color-border)' }} />
 
-          {/* Nav links — no active background, text colour only */}
+          {/* Nav links */}
           <nav className="flex items-center gap-1 flex-1">
             {NAV.map(link => {
               const active = isActive(link)
-              const hasDD  = !!link.dropdown
+              const hasDD  = !!(link.dropdown || link.categories)
               const ddOpen = activeDropdown === link.label
 
               return (
@@ -246,95 +291,208 @@ export default function Navbar() {
             onMouseEnter={() => openDD(activeDropdown)}
             onMouseLeave={closeDD}
           >
-            <div
-              style={{
-                width: '100%',
-                maxWidth: 860,
+            {/* ── Mentorship: two-panel light mega menu ── */}
+            {currentDD.categories ? (
+              <div style={{
+                width: '100%', maxWidth: 820,
                 background: '#ffffff',
                 border: '1px solid var(--color-border)',
                 borderRadius: '1.5rem',
                 boxShadow: '0 24px 64px rgba(0,0,0,0.11), 0 4px 16px rgba(0,0,0,0.05)',
-                padding: '1.5rem',
-              }}
-            >
-              <div
-                className="flex items-center justify-between mb-4 pb-3"
-                style={{ borderBottom: '1px solid var(--color-border)' }}
-              >
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-accent)' }}>
-                    Browse {activeDropdown}
-                  </p>
-                  <p className="text-xs mt-0.5" style={{ color: 'var(--color-textMuted)' }}>
-                    {currentDD.headline}
-                  </p>
+                overflow: 'hidden',
+                display: 'flex',
+              }}>
+                {/* Left panel — category list */}
+                <div style={{ width: 200, background: '#f8fafc', flexShrink: 0, padding: '1rem 0', borderRight: '1px solid var(--color-border)' }}>
+                  {currentDD.categories.map((cat, i) => {
+                    const isAct = activeCat === i
+                    return (
+                      <div
+                        key={cat.label}
+                        onClick={() => setActiveCat(i)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '0.7rem 1.1rem',
+                          cursor: 'pointer',
+                          borderLeft: isAct ? '3px solid var(--color-accent)' : '3px solid transparent',
+                          background: isAct ? 'rgba(37,99,235,0.07)' : 'transparent',
+                          transition: 'all 0.15s',
+                          userSelect: 'none',
+                        }}
+                      >
+                        <div>
+                          <p style={{
+                            fontSize: '0.88rem',
+                            fontWeight: isAct ? 700 : 500,
+                            color: isAct ? 'var(--color-accent)' : 'var(--color-text)',
+                            transition: 'color 0.15s',
+                            lineHeight: 1.3,
+                          }}>
+                            {cat.label}
+                          </p>
+                          {cat.desc && (
+                            <p style={{
+                              fontSize: '0.7rem',
+                              color: isAct ? 'var(--color-accent)' : 'var(--color-textMuted)',
+                              marginTop: 2,
+                              lineHeight: 1.4,
+                              opacity: isAct ? 0.85 : 0.7,
+                              transition: 'color 0.15s',
+                            }}>
+                              {cat.desc}
+                            </p>
+                          )}
+                        </div>
+                        {isAct && <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)', flexShrink: 0, marginLeft: 4 }} />}
+                      </div>
+                    )
+                  })}
                 </div>
-                <Link
-                  to={currentDD.path}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full"
-                  style={{
-                    color: 'var(--color-accent)',
-                    background: 'rgba(37,99,235,0.08)',
-                    border: '1px solid rgba(37,99,235,0.18)',
-                  }}
-                >
-                  View all <FaArrowRight size={9} />
-                </Link>
-              </div>
 
+                {/* Right panel — sub-courses grid */}
+                <div style={{ flex: 1, padding: '1.25rem' }}>
+                  {/* Category title */}
+                  <p style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem' }}>
+                    {currentDD.categories[activeCat].label}
+                  </p>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+                    {currentDD.categories[activeCat].items.map((item, i) => (
+                      <motion.div
+                        key={item.label}
+                        initial={{ opacity: 0, y: 4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.04, duration: 0.15 }}
+                      >
+                        <Link
+                          to={item.path}
+                          className="flex items-center justify-between gap-2 rounded-xl px-3 py-2.5"
+                          style={{ background: 'transparent', textDecoration: 'none', transition: 'background 0.15s' }}
+                          onMouseEnter={e => {
+                            e.currentTarget.style.background = 'rgba(37,99,235,0.06)'
+                            e.currentTarget.querySelector('.mega-label').style.color = 'var(--color-accent)'
+                          }}
+                          onMouseLeave={e => {
+                            e.currentTarget.style.background = 'transparent'
+                            e.currentTarget.querySelector('.mega-label').style.color = 'var(--color-text)'
+                          }}
+                        >
+                          <div>
+                            <p className="mega-label" style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text)', lineHeight: 1.3, transition: 'color 0.15s' }}>
+                              {item.label}
+                            </p>
+                            {item.desc && (
+                              <p style={{ fontSize: '0.75rem', color: 'var(--color-textMuted)', marginTop: 2, lineHeight: 1.4 }}>
+                                {item.desc}
+                              </p>
+                            )}
+                          </div>
+                          <FaArrowRight size={10} style={{ color: '#cbd5e1', flexShrink: 0 }} />
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* ── Career / Services: existing white grid dropdown ── */
               <div
-                className="grid gap-0.5"
-                style={{ gridTemplateColumns: `repeat(${currentDD.cols}, 1fr)` }}
+                style={{
+                  width: '100%',
+                  maxWidth: activeDropdown === 'Career' ? 300 : 860,
+                  background: '#ffffff',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: '1.5rem',
+                  boxShadow: '0 24px 64px rgba(0,0,0,0.11), 0 4px 16px rgba(0,0,0,0.05)',
+                  padding: '1.5rem',
+                }}
               >
-                {currentDD.dropdown.map((item, i) => (
-                  <motion.div
-                    key={item.label}
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.02, duration: 0.18 }}
+                {/* Header — hidden for Career */}
+                {activeDropdown !== 'Career' && (
+                  <div
+                    className="flex items-center justify-between mb-4 pb-3"
+                    style={{ borderBottom: '1px solid var(--color-border)' }}
                   >
-                    <Link
-                      to={item.path}
-                      className="block px-3 py-2.5 rounded-xl transition-all"
-                      style={{ background: 'transparent' }}
-                      onMouseEnter={e => {
-                        e.currentTarget.style.background = 'rgba(37,99,235,0.06)'
-                        e.currentTarget.querySelector('.dd-label').style.color = 'var(--color-accent)'
-                      }}
-                      onMouseLeave={e => {
-                        e.currentTarget.style.background = 'transparent'
-                        e.currentTarget.querySelector('.dd-label').style.color = 'var(--color-text)'
-                      }}
-                    >
-                      <p className="dd-label text-sm font-semibold leading-tight transition-colors" style={{ color: 'var(--color-text)' }}>
-                        {item.label}
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-accent)' }}>
+                        Browse {activeDropdown}
                       </p>
                       <p className="text-xs mt-0.5" style={{ color: 'var(--color-textMuted)' }}>
-                        {item.desc}
+                        {currentDD.headline}
                       </p>
+                    </div>
+                    <Link
+                      to={currentDD.path}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full"
+                      style={{
+                        color: 'var(--color-accent)',
+                        background: 'rgba(37,99,235,0.08)',
+                        border: '1px solid rgba(37,99,235,0.18)',
+                      }}
+                    >
+                      View all <FaArrowRight size={9} />
                     </Link>
-                  </motion.div>
-                ))}
-              </div>
+                  </div>
+                )}
 
-              <div
-                className="mt-4 pt-3 flex items-center justify-between"
-                style={{ borderTop: '1px solid var(--color-border)' }}
-              >
-                <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>
-                  {activeDropdown === 'Mentorship' && '🎓 Free first session on all programs'}
-                  {activeDropdown === 'Career'     && '💼 New openings added every week'}
-                  {activeDropdown === 'Services'   && '🚀 Free consultation call available'}
-                </p>
-                <Link
-                  to="/contact"
-                  className="text-xs font-semibold flex items-center gap-1"
-                  style={{ color: 'var(--color-accent)' }}
+                <div
+                  className="grid gap-0.5"
+                  style={{ gridTemplateColumns: `repeat(${currentDD.cols}, 1fr)` }}
                 >
-                  Talk to an expert <FaArrowRight size={9} />
-                </Link>
+                  {currentDD.dropdown.map((item, i) => (
+                    <motion.div
+                      key={item.label}
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.02, duration: 0.18 }}
+                    >
+                      <Link
+                        to={item.path}
+                        className="block px-3 py-2.5 rounded-xl transition-all"
+                        style={{ background: 'transparent' }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.background = 'rgba(37,99,235,0.06)'
+                          e.currentTarget.querySelector('.dd-label').style.color = 'var(--color-accent)'
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.background = 'transparent'
+                          e.currentTarget.querySelector('.dd-label').style.color = 'var(--color-text)'
+                        }}
+                      >
+                        <p className="dd-label text-sm font-semibold leading-tight transition-colors" style={{ color: 'var(--color-text)' }}>
+                          {item.label}
+                        </p>
+                        {item.desc && (
+                          <p className="text-xs mt-0.5" style={{ color: 'var(--color-textMuted)' }}>
+                            {item.desc}
+                          </p>
+                        )}
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Footer — hidden for Career */}
+                {activeDropdown !== 'Career' && (
+                  <div
+                    className="mt-4 pt-3 flex items-center justify-between"
+                    style={{ borderTop: '1px solid var(--color-border)' }}
+                  >
+                    <p className="text-xs" style={{ color: 'var(--color-textMuted)' }}>
+                      {activeDropdown === 'Services' && '🚀 Free consultation call available'}
+                    </p>
+                    <Link
+                      to="/contact"
+                      className="text-xs font-semibold flex items-center gap-1"
+                      style={{ color: 'var(--color-accent)' }}
+                    >
+                      Talk to an expert <FaArrowRight size={9} />
+                    </Link>
+                  </div>
+                )}
               </div>
-            </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -356,90 +514,177 @@ export default function Navbar() {
             }}
           >
             <div className="py-3 px-3">
+              {NAV.map((link) => {
+                const hasAcc = !!(link.dropdown || link.categories)
 
-              {NAV.map((link) => (
-                <div key={link.label}>
-                  {link.dropdown ? (
-                    /* Accordion section — header + card items */
-                    <div className="mb-1">
-                      {/* Section header row */}
-                      <button
-                        onClick={() => setMobileExpanded(p => p === link.label ? null : link.label)}
-                        className="w-full flex items-center justify-between px-3 py-3"
+                return (
+                  <div key={link.label}>
+
+                    {/* ── Mentorship: two-level category accordion ── */}
+                    {link.categories ? (
+                      <div className="mb-1">
+                        <button
+                          onClick={() => { setMobileExpanded(p => p === link.label ? null : link.label); setMobileCat(null) }}
+                          className="w-full flex items-center justify-between px-3 py-3"
+                        >
+                          <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-textMuted)', letterSpacing: '0.1em' }}>
+                            {link.label}
+                          </span>
+                          <motion.span animate={{ rotate: mobileExpanded === link.label ? 180 : 0 }} transition={{ duration: 0.22 }} style={{ display: 'inline-flex', color: 'var(--color-textMuted)' }}>
+                            <FaChevronDown size={12} />
+                          </motion.span>
+                        </button>
+
+                        <AnimatePresence>
+                          {mobileExpanded === link.label && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25, ease: 'easeInOut' }}
+                              style={{ overflow: 'hidden' }}
+                            >
+                              <div className="flex flex-col gap-1 pb-2 pl-2">
+                                {link.categories.map((cat) => (
+                                  <div key={cat.label}>
+                                    {/* Category header — click to expand sub-courses */}
+                                    <button
+                                      onClick={() => setMobileCat(p => p === cat.label ? null : cat.label)}
+                                      className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl"
+                                      style={{
+                                        background: mobileCat === cat.label ? 'rgba(37,99,235,0.08)' : 'transparent',
+                                        border: '1px solid',
+                                        borderColor: mobileCat === cat.label ? 'rgba(37,99,235,0.2)' : 'var(--color-border)',
+                                      }}
+                                    >
+                                      <div style={{ textAlign: 'left' }}>
+                                        <p className="text-sm font-semibold" style={{ color: mobileCat === cat.label ? '#2563eb' : 'var(--color-text)', lineHeight: 1.3 }}>
+                                          {cat.label}
+                                        </p>
+                                        {cat.desc && (
+                                          <p className="text-xs mt-0.5" style={{ color: mobileCat === cat.label ? '#2563eb' : 'var(--color-textMuted)', opacity: 0.75, lineHeight: 1.4 }}>
+                                            {cat.desc}
+                                          </p>
+                                        )}
+                                      </div>
+                                      <motion.span animate={{ rotate: mobileCat === cat.label ? 180 : 0 }} transition={{ duration: 0.2 }} style={{ display: 'inline-flex', color: mobileCat === cat.label ? '#2563eb' : 'var(--color-textMuted)', flexShrink: 0, marginLeft: 8 }}>
+                                        <FaChevronDown size={11} />
+                                      </motion.span>
+                                    </button>
+
+                                    {/* Sub-courses list */}
+                                    <AnimatePresence>
+                                      {mobileCat === cat.label && (
+                                        <motion.div
+                                          initial={{ height: 0, opacity: 0 }}
+                                          animate={{ height: 'auto', opacity: 1 }}
+                                          exit={{ height: 0, opacity: 0 }}
+                                          transition={{ duration: 0.2, ease: 'easeInOut' }}
+                                          style={{ overflow: 'hidden' }}
+                                        >
+                                          <div className="flex flex-col gap-1 pt-1 pl-2">
+                                            {cat.items.map((sub) => (
+                                              <Link
+                                                key={sub.label}
+                                                to={sub.path}
+                                                className="block px-3 py-2.5 rounded-xl"
+                                                style={{
+                                                  background: pathname === sub.path ? 'rgba(37,99,235,0.07)' : '#ffffff',
+                                                  border: '1px solid',
+                                                  borderColor: pathname === sub.path ? 'rgba(37,99,235,0.2)' : 'var(--color-border)',
+                                                }}
+                                              >
+                                                <p className="text-sm font-semibold" style={{ color: pathname === sub.path ? '#2563eb' : 'var(--color-text)' }}>
+                                                  {sub.label}
+                                                </p>
+                                                {sub.desc && (
+                                                  <p className="text-xs mt-0.5" style={{ color: 'var(--color-textMuted)', lineHeight: 1.4 }}>
+                                                    {sub.desc}
+                                                  </p>
+                                                )}
+                                              </Link>
+                                            ))}
+                                          </div>
+                                        </motion.div>
+                                      )}
+                                    </AnimatePresence>
+                                  </div>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+
+                        <div style={{ height: 1, background: 'var(--color-border)', margin: '2px 0 6px' }} />
+                      </div>
+
+                    ) : hasAcc ? (
+                      /* ── Career / Services: single-level accordion ── */
+                      <div className="mb-1">
+                        <button
+                          onClick={() => setMobileExpanded(p => p === link.label ? null : link.label)}
+                          className="w-full flex items-center justify-between px-3 py-3"
+                        >
+                          <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-textMuted)', letterSpacing: '0.1em' }}>
+                            {link.label}
+                          </span>
+                          <motion.span animate={{ rotate: mobileExpanded === link.label ? 180 : 0 }} transition={{ duration: 0.22 }} style={{ display: 'inline-flex', color: 'var(--color-textMuted)' }}>
+                            <FaChevronDown size={12} />
+                          </motion.span>
+                        </button>
+
+                        <AnimatePresence>
+                          {mobileExpanded === link.label && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25, ease: 'easeInOut' }}
+                              style={{ overflow: 'hidden' }}
+                            >
+                              <div className="flex flex-col gap-2 pb-2">
+                                {(link.dropdown || []).map((sub) => (
+                                  <Link
+                                    key={sub.label}
+                                    to={sub.path}
+                                    className="block px-4 py-3.5 rounded-xl"
+                                    style={{
+                                      background: pathname === sub.path ? 'rgba(37,99,235,0.07)' : '#ffffff',
+                                      border: '1px solid',
+                                      borderColor: pathname === sub.path ? 'rgba(37,99,235,0.2)' : 'var(--color-border)',
+                                    }}
+                                  >
+                                    <p className="text-sm font-semibold" style={{ color: pathname === sub.path ? '#2563eb' : 'var(--color-text)' }}>
+                                      {sub.label}
+                                    </p>
+                                    {sub.desc && (
+                                      <p className="text-xs mt-0.5" style={{ color: 'var(--color-textMuted)', lineHeight: 1.5 }}>
+                                        {sub.desc}
+                                      </p>
+                                    )}
+                                  </Link>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+
+                        <div style={{ height: 1, background: 'var(--color-border)', margin: '2px 0 6px' }} />
+                      </div>
+
+                    ) : (
+                      /* ── Simple nav link ── */
+                      <Link
+                        to={link.path}
+                        className="flex items-center px-3 py-3 text-sm font-semibold mb-0.5 transition-all"
+                        style={{ color: pathname === link.path ? '#2563eb' : 'var(--color-text)' }}
                       >
-                        <span
-                          className="text-xs font-bold uppercase tracking-widest"
-                          style={{ color: 'var(--color-textMuted)', letterSpacing: '0.1em' }}
-                        >
-                          {link.label}
-                        </span>
-                        <motion.span
-                          animate={{ rotate: mobileExpanded === link.label ? 180 : 0 }}
-                          transition={{ duration: 0.22 }}
-                          style={{ display: 'inline-flex', color: 'var(--color-textMuted)' }}
-                        >
-                          <FaChevronDown size={12} />
-                        </motion.span>
-                      </button>
-
-                      {/* Expandable sub-items as cards */}
-                      <AnimatePresence>
-                        {mobileExpanded === link.label && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.25, ease: 'easeInOut' }}
-                            style={{ overflow: 'hidden' }}
-                          >
-                            <div className="flex flex-col gap-2 pb-2">
-                              {link.dropdown.map((sub) => (
-                                <Link
-                                  key={sub.label}
-                                  to={sub.path}
-                                  className="block px-4 py-3.5 rounded-xl"
-                                  style={{
-                                    background: pathname === sub.path ? 'rgba(37,99,235,0.07)' : '#ffffff',
-                                    border: '1px solid',
-                                    borderColor: pathname === sub.path ? 'rgba(37,99,235,0.2)' : 'var(--color-border)',
-                                  }}
-                                >
-                                  <p
-                                    className="text-sm font-semibold"
-                                    style={{ color: pathname === sub.path ? '#2563eb' : 'var(--color-text)' }}
-                                  >
-                                    {sub.label}
-                                  </p>
-                                  <p
-                                    className="text-xs mt-0.5"
-                                    style={{ color: 'var(--color-textMuted)', lineHeight: 1.5 }}
-                                  >
-                                    {sub.desc}
-                                  </p>
-                                </Link>
-                              ))}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-
-                      {/* Divider */}
-                      <div style={{ height: 1, background: 'var(--color-border)', margin: '2px 0 6px' }} />
-                    </div>
-                  ) : (
-                    /* Simple top-level link */
-                    <Link
-                      to={link.path}
-                      className="flex items-center px-3 py-3 text-sm font-semibold mb-0.5 transition-all"
-                      style={{
-                        color: pathname === link.path ? '#2563eb' : 'var(--color-text)',
-                      }}
-                    >
-                      {link.label}
-                    </Link>
-                  )}
-                </div>
-              ))}
+                        {link.label}
+                      </Link>
+                    )}
+                  </div>
+                )
+              })}
 
               {/* Get in Touch CTA */}
               <div className="pt-2 pb-1">
@@ -454,7 +699,6 @@ export default function Navbar() {
                   Get in Touch <FaArrowRight size={11} />
                 </Link>
               </div>
-
             </div>
           </motion.div>
         )}

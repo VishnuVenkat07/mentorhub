@@ -5,22 +5,19 @@ import Footer     from './components/layout/Footer'
 import PageLoader from './components/ui/PageLoader'
 import Home    from './pages/Home'
 import About   from './pages/About'
-import Mentorship from './pages/Mentorship'
 import Jobs        from './pages/career/Jobs'
 import Internships from './pages/career/Internships'
 import Services from './pages/Services'
 import Contact from './pages/Contact'
 
-// Mentorship sub-pages
+// Mentorship legacy category pages (kept for direct URL access)
 import FullStack        from './pages/mentorship/FullStack'
-import MobileApp        from './pages/mentorship/MobileApp'
-import Design           from './pages/mentorship/Design'
 import DataAnalytics    from './pages/mentorship/DataAnalytics'
 import DevOps           from './pages/mentorship/DevOps'
-import MERN             from './pages/mentorship/MERN'
 import CollegePlacement from './pages/mentorship/CollegePlacement'
-import ResumeBuilding   from './pages/mentorship/ResumeBuilding'
-import AITools          from './pages/mentorship/AITools'
+
+// Mentorship sub-course detail (dynamic)
+import SubCourseDetail from './pages/mentorship/SubCourseDetail'
 
 // Service detail pages
 import ServiceDetail from './pages/services/ServiceDetail'
@@ -46,22 +43,19 @@ export default function App() {
           <Routes>
             <Route path="/"       element={<Home />} />
             <Route path="/about"  element={<About />} />
-            <Route path="/mentorship" element={<Mentorship />} />
             <Route path="/career/jobs"        element={<Jobs />} />
             <Route path="/career/internships" element={<Internships />} />
             <Route path="/services" element={<Services />} />
             <Route path="/contact" element={<Contact />} />
 
-            {/* Mentorship sub-pages */}
+            {/* Mentorship legacy category pages */}
             <Route path="/mentorship/full-stack"        element={<FullStack />} />
-            <Route path="/mentorship/mobile-app"        element={<MobileApp />} />
-            <Route path="/mentorship/design"            element={<Design />} />
             <Route path="/mentorship/data-analytics"    element={<DataAnalytics />} />
             <Route path="/mentorship/devops"            element={<DevOps />} />
-            <Route path="/mentorship/mern"              element={<MERN />} />
             <Route path="/mentorship/college-placement" element={<CollegePlacement />} />
-            <Route path="/mentorship/resume-building"   element={<ResumeBuilding />} />
-            <Route path="/mentorship/ai-tools"          element={<AITools />} />
+
+            {/* Mentorship sub-course pages — dynamic template */}
+            <Route path="/mentorship/:courseId" element={<SubCourseDetail />} />
 
             {/* Career individual job/internship pages */}
             <Route path="/career/:id" element={<JobDetail />} />
