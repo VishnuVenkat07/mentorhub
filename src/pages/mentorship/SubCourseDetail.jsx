@@ -5,6 +5,6 @@ import MentorshipSubPage from './MentorshipSubPage'
 export default function SubCourseDetail() {
   const { courseId } = useParams()
   const course = subCourses.find(c => c.id === courseId)
-  if (!course) return <Navigate to="/mentorship" replace />
+  if (!course) return <Navigate to="/" replace />
   return <MentorshipSubPage program={course} />
 }

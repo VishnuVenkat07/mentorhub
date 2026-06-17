@@ -54,7 +54,6 @@ export const subCourses = [
       'Full deployment pipeline to cloud',
     ],
   },
-
   {
     id: 'mern',
     path: '/mentorship/mern',

@@ -1,83 +1,13 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Link } from 'react-router-dom'
 import {
   FaBriefcase, FaMapMarkerAlt, FaClock, FaMoneyBillWave,
-  FaCheckCircle, FaArrowRight, FaUsers, FaRocket, FaHandshake, FaStar,
+  FaTimes, FaUpload, FaCheckCircle, FaChevronDown,
+  FaArrowRight, FaUsers, FaRocket, FaHandshake, FaStar,
 } from 'react-icons/fa'
 import { jobs, internships } from '../data/jobs'
 
-// ─── Job Card ──────────────────────────────────────────────────────────────────
-function JobCard({ item, isInternship }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      whileHover={{ y: -3, boxShadow: '0 12px 32px rgba(37,99,235,0.12)' }}
-      transition={{ duration: 0.3 }}
-      style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '1rem', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', transition: 'box-shadow 0.3s, transform 0.3s' }}
-    >
-      <div className="p-5">
-        {/* Top row */}
-        <div className="flex items-start justify-between gap-4 mb-3">
-          <div>
-            <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold mb-2"
-              style={{ background: isInternship ? '#f0fdf4' : '#eff6ff', color: isInternship ? '#16a34a' : '#2563eb' }}>
-              {isInternship ? '🎓 Internship' : '💼 Full-Time'}
-            </span>
-            <h3 className="font-black" style={{ fontSize: '1rem', color: '#0f172a', lineHeight: 1.3 }}>{item.title}</h3>
-            <p className="text-sm mt-0.5 font-semibold" style={{ color: '#2563eb' }}>{item.company}</p>
-          </div>
-          <span className="text-xs flex-shrink-0 mt-1" style={{ color: '#94a3b8' }}>{item.postedAt}</span>
-        </div>
-
-        {/* Description preview */}
-        <p style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.7, marginBottom: 12,
-          display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-          {item.description}
-        </p>
-
-        {/* Badges */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full" style={{ background: '#f1f5f9', color: '#475569' }}>
-            <FaMapMarkerAlt size={9} /> {item.location}
-          </span>
-          <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full" style={{ background: '#f1f5f9', color: '#475569' }}>
-            <FaBriefcase size={9} /> {item.experience}
-          </span>
-          {isInternship && (
-            <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full" style={{ background: '#f0fdf4', color: '#16a34a' }}>
-              <FaClock size={9} /> {item.duration}
-            </span>
-          )}
-          <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full" style={{ background: '#fefce8', color: '#ca8a04' }}>
-            <FaMoneyBillWave size={9} /> {item.salary || item.stipend}
-          </span>
-        </div>
-
-        {/* Tags */}
-        <div className="flex flex-wrap gap-1.5 mb-4">
-          {item.tags.map(t => (
-            <span key={t} className="px-2.5 py-0.5 rounded-md text-xs font-medium"
-              style={{ background: '#eff6ff', color: '#2563eb', border: '1px solid #dbeafe' }}>{t}</span>
-          ))}
-        </div>
-
-        {/* CTA */}
-        <Link to={`/career/${item.id}`}
-          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl font-bold text-white transition-all"
-          style={{ background: 'linear-gradient(135deg,#1e3a8a,#2563eb)', fontSize: '0.875rem', boxShadow: '0 4px 14px rgba(37,99,235,0.25)' }}
-          onMouseEnter={e => e.currentTarget.style.opacity = '0.9'}
-          onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
-          View & Apply <FaArrowRight size={11} />
-        </Link>
-      </div>
-    </motion.div>
-  )
-}
-
-// ─── Apply Modal (kept for reference but not used) ─────────────────────────────
+// ─── Apply Modal ───────────────────────────────────────────────────────────────
 function ApplyModal({ item, onClose }) {
   const [form, setForm]           = useState({ name: '', email: '', phone: '', note: '', file: null })
   const [submitted, setSubmitted] = useState(false)
@@ -363,9 +293,10 @@ const WHY = [
 
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 export default function Career() {
-  const [tab, setTab] = useState('jobs')
+  const [tab, setTab]       = useState('jobs')      // 'jobs' | 'internships'
+  const [applying, setApplying] = useState(null)
 
-  const data         = tab === 'jobs' ? jobs : internships
+  const data        = tab === 'jobs' ? jobs : internships
   const isInternship = tab === 'internships'
 
   return (
@@ -489,7 +420,7 @@ export default function Career() {
             </p>
           </div>
 
-          {/* Cards grid */}
+          {/* Accordion list */}
           <AnimatePresence mode="wait">
             <motion.div
               key={tab}
@@ -497,10 +428,15 @@ export default function Career() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -16 }}
               transition={{ duration: 0.22 }}
-              className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5"
+              className="flex flex-col gap-3"
             >
               {data.map((item) => (
-                <JobCard key={item.id} item={item} isInternship={isInternship} />
+                <JobRow
+                  key={item.id}
+                  item={item}
+                  isInternship={isInternship}
+                  onApply={setApplying}
+                />
               ))}
             </motion.div>
           </AnimatePresence>
